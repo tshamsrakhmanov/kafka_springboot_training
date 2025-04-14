@@ -1,0 +1,100 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - internal_network
+  kafka1:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "9090:9090"
+      - "9094:9094"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: INTERNAL_LISTENER://kafka1:9090,EXTERNAL_LISTENER://kafka1:9094
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL_LISTENER://kafka1:9090,EXTERNAL_LISTENER://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL_LISTENER:PLAINTEXT, EXTERNAL_LISTENER:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 4
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL_LISTENER
+    networks:
+      - internal_network
+  kafka2:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "9091:9091"
+      - "9095:9095"
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: INTERNAL_LISTENER://kafka2:9091,EXTERNAL_LISTENER://kafka2:9095
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL_LISTENER://kafka2:9091,EXTERNAL_LISTENER://localhost:9095
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL_LISTENER:PLAINTEXT, EXTERNAL_LISTENER:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 4
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL_LISTENER
+    networks:
+      - internal_network
+  kafka3:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "9096:9096"
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: INTERNAL_LISTENER://kafka3:9092,EXTERNAL_LISTENER://kafka3:9096
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL_LISTENER://kafka3:9092,EXTERNAL_LISTENER://localhost:9096
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL_LISTENER:PLAINTEXT, EXTERNAL_LISTENER:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 4
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL_LISTENER
+    networks:
+      - internal_network
+  kafka4:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "9093:9093"
+      - "9097:9097"
+    environment:
+      KAFKA_BROKER_ID: 4
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: INTERNAL_LISTENER://kafka4:9093,EXTERNAL_LISTENER://kafka4:9097
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL_LISTENER://kafka4:9093,EXTERNAL_LISTENER://localhost:9097
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL_LISTENER:PLAINTEXT, EXTERNAL_LISTENER:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 4
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL_LISTENER
+    networks:
+      - internal_network
+
+  stub1:
+    build: .
+    image: stub_image
+    depends_on:
+      - zookeeper
+      - kafka1
+      - kafka2
+      - kafka3
+      - kafka4
+    container_name: stub1
+    ports:
+      - "1234:1234"
+    networks:
+      - internal_network
+
+networks:
+  internal_network:
